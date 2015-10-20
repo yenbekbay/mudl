@@ -27,6 +27,28 @@ To install from PyPI, run the following command:
 
 For usage, run ``mudl -h`` or ``mudl --help``.
 
+Usage
+-----
+
+.. code-block:: shell
+
+    mudl [-h] [-q {high,medium,low}] [--skipmatch] [--configure] [query]
+
+    Downloads the mp3 file for the given query if the track can be found on VK in
+    the given quality
+    
+    positional arguments:
+      query                 The track title to look for (Artist - Title)
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -q {high,medium,low}, --quality {high,medium,low}
+                            minimum quality for the downloaded track, where high =
+                            320kbps, medium = 256kbps, and low = 128kbps (default
+                            is high)
+      --skipmatch           skip matching for track (decreases accuracy)
+      --configure           edit the configuration
+
 The MIT License
 ---------------
 
