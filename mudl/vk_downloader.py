@@ -627,7 +627,7 @@ class VKDownloader(object):
             contents = open(path, 'r').read()
             if not self.user_query.raw_query in contents:
                 puts(colored.yellow('Added to wishlist'))
-                wishlist.write('\n' + self.user_query.raw_query)
+                wishlist.write('\n' + self.user_query.raw_query.encode('utf-8'))
 
 
 class Helpers(object):

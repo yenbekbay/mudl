@@ -84,8 +84,8 @@ class VKAuth(object):
     """
     Getting access_token for VK.com
     """
-    def __init__(self, email, password, client_id, scope):
-        self.email = email
+    def __init__(self, login, password, client_id, scope):
+        self.login = login
         self.password = password
         self.client_id = client_id
         if not isinstance(scope, list):
@@ -134,7 +134,7 @@ class VKAuth(object):
         if not parser.form_parsed or parser.url is None or 'pass' not in parser.params or\
             'email' not in parser.params:
             raise RuntimeError('Something wrong')
-        parser.params['email'] = self.email
+        parser.params['email'] = self.login
         parser.params['pass'] = self.password
         if parser.method == 'POST':
             if PY3:

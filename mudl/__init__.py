@@ -142,7 +142,7 @@ class Configuration(object):
         self.save()
 
     def connect(self):
-        if self.get('vk_email') and self.get('vk_password'):
+        if self.get('vk_login') and self.get('vk_password'):
             is_valid_ip = False
             if self.get('last_ip'):
                 is_valid_ip = Configuration.getIp() == self.get('last_ip')
@@ -150,10 +150,10 @@ class Configuration(object):
                 auth_token = self.get('auth_token')
                 user_id = self.get('user_id')
             else:
-                vk_email = self.get('vk_email')
+                vk_login = self.get('vk_login')
                 vk_password = self.get('vk_password')
                 try:
-                    auth_token, user_id = VKAuth(vk_email, vk_password, '3607693',\
+                    auth_token, user_id = VKAuth(vk_login, vk_password, '3607693',\
                         ['offline', 'audio'])()
                     self.set('auth_token', auth_token)
                     self.set('user_id', user_id)
@@ -167,17 +167,18 @@ class Configuration(object):
                 u'access to music search')
             while True:
                 while True:
-                    vk_email = input(u'Please enter your VK email: ')
-                    is_valid = re.match(r'[^@]+@[^@]+\.[^@]+', vk_email)
+                    vk_login = input(u'Please enter your VK login: ')
+                    is_valid =  re.match(r'[^@]+@[^@]+\.[^@]+', vk_login) or\
+                        re.match(r'\+?(\d{3})\D*(\d{3})\D*(\d{4})\D*(\d*)$', vk_login)
                     if is_valid:
                         break
                     else:
-                        puts(colored.yellow(u'Please enter a valid email'))
+                        puts(colored.yellow(u'Please enter a valid email or phone number'))
                 vk_password = getpass(u'Please enter your VK password: ')
-                self.set('vk_email', vk_email)
+                self.set('vk_login', vk_login)
                 self.set('vk_password', vk_password)
                 try:
-                    auth_token, user_id = VKAuth(vk_email, vk_password, '3607693',\
+                    auth_token, user_id = VKAuth(vk_login, vk_password, '3607693',\
                         ['offline', 'audio'])()
                     self.set('auth_token', auth_token)
                     self.set('user_id', user_id)
@@ -208,7 +209,7 @@ class MusicDownloader(object):
         if not args['query']:
             puts(arguments.help())
             sys.exit(1)
-        elif len(args['query'].replace(u'\u2013', '-').split(' - ')) < 2:
+        elif len(args['query'].decode('utf-8').replace(u'\u2013', '-').split(' - ')) < 2:
             puts(colored.red('Please provide query in format "Artist - Title"'))
             sys.exit(1)
         configuration.configure()
@@ -218,7 +219,7 @@ class MusicDownloader(object):
             args['skip_match'] = configuration.skip_match
         access_token, user_id = configuration.connect()
         vk_downloader = VKDownloader(access_token, user_id)
-        vk_downloader.process(args['query'], args['min_quality'], args['skip_match'])
+        vk_downloader.process(args['query'].decode('utf-8'), args['min_quality'], args['skip_match'])
 
 def main():
     try:
