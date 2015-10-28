@@ -625,7 +625,7 @@ class VKDownloader(object):
         path = os.path.join(self.saving_path, 'wishlist.txt')
         with open(path, 'a+') as wishlist:
             contents = open(path, 'r').read()
-            if not self.user_query.raw_query in contents:
+            if not self.user_query.raw_query.encode('utf-8') in contents:
                 puts(colored.yellow('Added to wishlist'))
                 wishlist.write('\n' + self.user_query.raw_query.encode('utf-8'))
 
