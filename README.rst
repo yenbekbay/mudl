@@ -14,6 +14,8 @@ A cli tool for downloading music from VK in high quality and with correct tags a
 
 Supports both Python 2.x and 3.x
 
+.. image:: https://raw.githubusercontent.com/yenbekbay/mudl/master/demo.gif
+
 Installation
 ------------
 
