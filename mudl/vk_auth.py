@@ -20,9 +20,7 @@ from future.utils import PY3
 standard_library.install_aliases()
 
 import http.cookiejar
-import urllib.request
-import urllib.error
-import urllib.parse
+import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 from html.parser import HTMLParser
 if PY3:

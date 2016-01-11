@@ -33,6 +33,7 @@ import os
 import re
 import socket
 import sys
+import urllib.request, urllib.error, urllib.parse
 
 class Arguments(object):
     def __init__(self):
@@ -126,19 +127,22 @@ class Configuration(object):
             self.iterator += 1
             while True:
                 skip_match = input('{0}. '.format(self.iterator) + u'Do you want to skip ' +\
-                    u'matching by default?\nEnter "yes" or return to keep matching: ')
+                    u'matching by default?\nEnter "yes" to skip matching, "soundcloud" to only skip soundcloud, or "musicbrainz" to only skip musicbrainz, or return to keep matching: ')
                 if len(skip_match) > 0:
                     if skip_match == 'yes':
                         self.set('skip_match', 'true')
                         break
+                    elif skip_match == 'soundcloud' or skip_match == 'musicbrainz':
+                        self.set('skip_match', skip_match)
+                        break
                     else:
-                        puts(colored.yellow(u'Please enter "yes" or return'))
+                        puts(colored.yellow(u'Please enter "yes", "soundcloud", "musicbrainz", or return'))
                 else:
                     self.set('skip_match', 'false')
                     break
         self.saving_path = self.get('saving_path')
         self.min_quality = int(self.get('min_quality'))
-        self.skip_match = self.get('skip_match') == 'true'
+        self.skip_match = self.get('skip_match')
         self.save()
 
     def connect(self):
@@ -191,10 +195,7 @@ class Configuration(object):
 
     @classmethod
     def getIp(cls):
-        return [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not\
-            ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 80)), s.getsockname()[0],\
-            s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]])\
-            if l][0][0]
+        return urllib.request.urlopen('http://ip.42.pl/raw').read().decode('utf-8')
 
 
 class MusicDownloader(object):
@@ -219,7 +220,7 @@ class MusicDownloader(object):
             args['skip_match'] = configuration.skip_match
         access_token, user_id = configuration.connect()
         vk_downloader = VKDownloader(access_token, user_id)
-        vk_downloader.process(args['query'].decode('utf-8'), args['min_quality'], args['skip_match'])
+        vk_downloader.process(args['query'].decode('utf-8'), args['min_quality'], str(args['skip_match']).lower())
 
 def main():
     try:

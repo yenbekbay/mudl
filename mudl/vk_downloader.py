@@ -205,7 +205,8 @@ class VKDownloader(object):
         found in VK database.
         """
         self.user_query = TrackQuery(query)
-        if not skip_match:
+        self.skip_match = skip_match
+        if skip_match != 'true':
             self.match = self.get_match()
             if self.match:
                 self.match_query = TrackQuery(u'{0} - {1}'.format(self.match.artist,\
@@ -233,11 +234,12 @@ class VKDownloader(object):
         """
         puts(u'Looking for a match')
         matches = []
-        # Search for matches on MusicBrainz.
-        matches.extend(self.search_mb())
-        matches = VKDownloader.filter_by_cover(self.sort_matches(matches))
-        self.track_feat = self.get_feat(matches)
-        if not matches or not matches[0].cover:
+        if self.skip_match != 'musicbrainz':
+            # Search for matches on MusicBrainz.
+            matches.extend(self.search_mb())
+            matches = VKDownloader.filter_by_cover(self.sort_matches(matches))
+            self.track_feat = self.get_feat(matches)
+        if (not matches or not matches[0].cover) and self.skip_match != 'soundcloud':
             # Search for matches on Soundcloud.
             matches.extend(self.search_soundcloud())
             matches = VKDownloader.filter_by_cover(self.sort_matches(matches))
@@ -490,7 +492,7 @@ class VKDownloader(object):
         return results
 
     def search_mb(self):
-        musicbrainzngs.set_useragent('music-downloader', '0.1')
+        musicbrainzngs.set_useragent('mudl', '0.1.3')
         criteria = {
             'artist': self.user_query.bare_artist(),
             'recording': self.user_query.bare_title()
