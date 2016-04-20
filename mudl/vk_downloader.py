@@ -26,7 +26,7 @@ from past.builtins import basestring
 from past.utils import old_div
 from builtins import object
 
-from clint.textui import puts, colored
+from clint.textui import colored
 from clint import resources
 from configparser import ConfigParser
 from difflib import SequenceMatcher
@@ -216,7 +216,7 @@ class VKDownloader(object):
                 search_query = self.user_query
         else:
             search_query = self.user_query
-        puts(u'Fetching results from VK music library')
+        print(u'Fetching results from VK music library')
         url = furl('https://api.vk.com/method/audio.search').add({
             'uids': str(self.user_id),
             'q': search_query.bare_query,
@@ -232,7 +232,7 @@ class VKDownloader(object):
         If found any, compares them by similarity to the query and duration.
         Returns the best match.
         """
-        puts(u'Looking for a match')
+        print(u'Looking for a match')
         matches = []
         if self.skip_match != 'musicbrainz':
             # Search for matches on MusicBrainz.
@@ -249,11 +249,11 @@ class VKDownloader(object):
         if 'radio' not in self.user_query.title:
             matches.sort(key=lambda x: x.duration, reverse=True)
         if matches:
-            puts(u'Match from {0}: {1} - {2} ({3})'.format(matches[0].source, matches[0].artist,\
-                matches[0].title, Helpers.duration_string(matches[0].duration)))
+            print(colored.green(u'Match from {0}: {1} - {2} ({3})'.format(matches[0].source,\
+                matches[0].artist, matches[0].title, Helpers.duration_string(matches[0].duration))))
             return matches[0]
         else:
-            puts(colored.yellow(u'No match found'))
+            print(colored.yellow(u'No match found'))
             return None
 
     def sort_matches(self, matches):
@@ -312,7 +312,7 @@ class VKDownloader(object):
             file_path = os.path.join(self.saving_path, file_name)
             kbps = int(64 * round(old_div(float(file_size * 8 / 1024 / int(duration)), 64)))
             if not os.access(file_path, os.F_OK) or os.stat(file_path).st_size < file_size:
-                puts('Downloading: "%s" (%.2fMB, %s, %dkbps)' % (file_name,\
+                print(u'Downloading: "{0}" ({1:.2f}MB, {2}, {3}kbps)'.format(file_name,\
                     file_size / 1024 / 1024, Helpers.duration_string(duration), kbps))
                 f = open(file_path, 'wb')
                 progress = 0
@@ -323,7 +323,7 @@ class VKDownloader(object):
                     # Make a fancy progress bar.
                     progress = float(size_dl) / file_size * 100
                     if int(progress) % 2 == 0:
-                        puts('[{0}{1}] {2}%'.format('#' * int(old_div(progress, 4)), ' ' *\
+                        print(u'[{0}{1}] {2}%'.format('#' * int(old_div(progress, 4)), ' ' *\
                             (25 - int(old_div(progress, 4))), int(progress)))
                         if progress != 100:
                             sys.stdout.write('\033[F') # Cursor up one line
@@ -334,9 +334,9 @@ class VKDownloader(object):
                     f.write(download_buffer)
                 f.close()
                 self.set_tags(save_query, file_path)
-                puts(colored.green('Downloaded {0} successfully'.format(file_name)))
+                print(colored.green(u'Downloaded {0} successfully'.format(file_name)))
             else:
-                puts(colored.yellow('File already exists'))
+                print(colored.yellow(u'File already exists'))
 
     def set_tags(self, track_query, file_path):
         """
@@ -445,7 +445,7 @@ class VKDownloader(object):
             if min_kbps == 320 and not sorted_results: # If nothing was found, try lower quality.
                 sorted_results = self.sort_results(results, 256)
                 if not sorted_results:
-                    puts(colored.red(u'Could not find anything for "{0}"'\
+                    print(colored.red(u'Could not find anything for "{0}"'\
                         .format(self.user_query.bare_query)))
                     answer = input(u'Try without restrictions? (y/n) ').lower()
                     if answer == 'y':
@@ -453,7 +453,7 @@ class VKDownloader(object):
                         if not sorted_results:
                             sorted_results = self.sort_results(results, 128)
                             if not sorted_results:
-                                puts(colored.red(u'Still nothing for "{0}"'\
+                                print(colored.red(u'Still nothing for "{0}"'\
                                     .format(self.user_query.bare_query)))
                                 self.add_to_wishlist()
                     else:
@@ -473,7 +473,7 @@ class VKDownloader(object):
         total = len(results)
         if total > 0:
             for i in range(total):
-                puts('Analyzing {0}%'.format(int(float(i+1) / total * 100)))
+                print(u'Analyzing {0}%'.format(int(float(i+1) / total * 100)))
                 if i < total - 1:
                     sys.stdout.write('\033[F') # Cursor up one line
                 url = results[i]['url']
@@ -485,7 +485,7 @@ class VKDownloader(object):
                 else:
                     results[i] = None
         else:
-            puts(colored.red('Could not find anything for "{0}"'\
+            print(colored.red(u'Could not find anything for "{0}"'\
                 .format(self.user_query.bare_query)))
             self.add_to_wishlist()
         results = filter(None, results)
@@ -502,7 +502,7 @@ class VKDownloader(object):
             for recording in recordings['recording-list']:
                 yield VKDownloader.get_mb_info(recording)
         except Exception as e:
-            puts(colored.red(u'Something went wrong with the request: {0}'.format(e)))
+            print(colored.red(u'Something went wrong with the request: {0}'.format(e)))
 
     @classmethod
     def get_mb_info(cls, recording):
@@ -609,7 +609,7 @@ class VKDownloader(object):
                 matches.append(match)
             return matches
         except Exception as e:
-            puts(colored.red(u'Something went wrong with the request: {0}'.format(e)))
+            print(colored.red(u'Something went wrong with the request: {0}'.format(e)))
 
     def get_feat(self, matches):
         """
@@ -628,7 +628,7 @@ class VKDownloader(object):
         with open(path, 'a+') as wishlist:
             contents = open(path, 'r').read()
             if not self.user_query.raw_query.encode('utf-8') in contents:
-                puts(colored.yellow('Added to wishlist'))
+                print(colored.yellow(u'Added to wishlist'))
                 wishlist.write('\n' + self.user_query.raw_query.encode('utf-8'))
 
 
@@ -647,11 +647,11 @@ class Helpers(object):
                     if x == 3:
                         x = 0
                     x += 1
-                    puts('Please wait{0}{1}'.format('.' * x, ' ' * (3-x)))
+                    print(u'Please wait{0}{1}'.format('.' * x, ' ' * (3-x)))
                     sys.stdout.write('\033[F') # Cursor up one line
                     time.sleep(1)
             else:
-                puts('Check your internet connection')
+                print(u'Check your internet connection')
                 sys.exit()
 
     @classmethod
