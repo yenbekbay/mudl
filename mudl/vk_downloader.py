@@ -87,8 +87,8 @@ class TrackQuery(object):
         if any(x in title for x in (' feat.', '(feat.')):
             if '(feat.' in title:
                 lindex = title.find('(feat.')
-                rindex = title.find(')', lindex)
-                feat = title[lindex+1:rindex].rstrip()
+                rindex = title.find(')', lindex) + 1
+                feat = title[lindex+1:rindex-1].rstrip()
             else:
                 lindex = title.find('feat.')
                 rindex = title.find('(', lindex)
@@ -104,7 +104,7 @@ class TrackQuery(object):
                 if rindex != -1 and rindex < len(title) - 1:
                     if title[rindex+1] == ' ':
                         rindex += 1
-                title = title[0:lindex] + ' ' + title[rindex+1:]
+                title = title[0:lindex] + ' ' + title[rindex:]
         # Check the insides of all parentheses in the string.
         for a in re.compile(r'\([^()]*\)').findall(title):
             if not any(b in a.lower() for b in ('mix', 'remix', 'bootleg', 'edit', 'remake',\
@@ -427,7 +427,7 @@ class VKDownloader(object):
                 # Remove the file from list if it's not the right mix.
                 elif self.user_query.is_remix and\
                     (not any(x in name.lower() for x in ('mix', 'remix', 'rmx', 'edit', 'mash')) or\
-                    any(x in name.lower()  for x in ('(original', '(extended', '(radio', '(dub'))):
+                    any(x in name.lower() for x in ('(original', '(extended', '(radio', '(dub'))):
                     to_remove.append(i)
                 elif not self.user_query.is_remix and\
                     (any(x in name.lower() for x in ('mix', 'remix', 'rmx', 'edit', 'mash')) and\
