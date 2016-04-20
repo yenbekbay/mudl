@@ -24,7 +24,7 @@ def _read(fn):
 
 setup(
     name='mudl',
-    version='0.1.3',
+    version='0.1.4',
     description='A cli tool for downloading music from VK in high quality',
     long_description=_read('README.rst'),
     url='https://github.com/yenbekbay/mudl',
